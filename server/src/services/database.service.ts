@@ -8,7 +8,7 @@ export const collections: {
   tickers?: Collection<Ticker>;
 } = {};
 
-export const redisClient = createClient();
+export const redisClient = createClient({ url: process.env.REDIS_CLIENT });
 
 export async function connectToDatabase() {
   dotenv.config();
