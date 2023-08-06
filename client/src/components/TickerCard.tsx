@@ -1,12 +1,12 @@
 import LineChart from "../components/LineChart";
 import { styled } from "styled-components";
-import useQuote from "../hooks/useQuote";
 import useHistoricalData from "../hooks/useHistoricalData";
 import { MouseEventHandler } from "react";
+import { useQuote } from "../hooks/useQuote";
 
 export default function TickerCard({ handler, ticker}: {ticker: string; handler: MouseEventHandler}) {
-  const { quote } = useQuote(ticker);
   const { data } = useHistoricalData(ticker);
+  const {quote} = useQuote(ticker);
   return (
     quote &&
     data && (

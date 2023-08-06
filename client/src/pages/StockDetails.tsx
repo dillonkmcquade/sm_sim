@@ -12,7 +12,7 @@ import LineChart from "../components/LineChart";
 import Button from "../components/Button";
 
 import useHistoricalData from "../hooks/useHistoricalData";
-import useQuote from "../hooks/useQuote";
+import {useQuote} from "../hooks/useQuote";
 import useNewsData from "../hooks/useTickerNewsData";
 import { useDebounce } from "../hooks/useDebounce";
 import { useAuth0 } from "@auth0/auth0-react";

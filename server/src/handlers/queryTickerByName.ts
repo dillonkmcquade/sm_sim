@@ -1,6 +1,6 @@
 "use strict";
 import { Response, Request } from "express";
-import { collections } from "../services/database.service";
+import { collections, redisClient } from "../services/database.service";
 import { Ticker } from "../types";
 
 export const queryTickerByName = async (req: Request, res: Response) => {
@@ -46,6 +46,7 @@ export const queryTickerByName = async (req: Request, res: Response) => {
     if (data?.length === 0) {
       return res.status(400).json({ status: 400, message: "Not found" });
     }
+    await redisClient.set(req.url, JSON.stringify(data));
     return res.status(200).json({
       status: 200,
       results: data,

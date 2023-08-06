@@ -10,6 +10,7 @@ import { queryTickerByName } from "./handlers/queryTickerByName";
 import userRouter from "./routes/user";
 import transactionRouter from "./routes/transaction";
 import stockRouter from "./routes/stock";
+import { checkCache } from "./utils";
 
 dotenv.config();
 
@@ -29,7 +30,7 @@ connectToDatabase()
       .use("/user", userRouter)
       .use("/transaction", transactionRouter)
 
-      .get("/search", queryTickerByName)
+      .get("/search", checkCache, queryTickerByName)
       .get("*", (_req, res) => {
         return res.send("<h1>Does not exist</h1>");
       });

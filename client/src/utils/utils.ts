@@ -18,20 +18,14 @@ export async function getPrices(holdings: Holding[]) {
   );
   try {
     const priceRequests = uniqueTickers.map(async (ticker) => {
-      const cached = window.sessionStorage.getItem(ticker);
-      if (cached && Date.now() / 1000 - JSON.parse(cached).t < 300) {
-        // Check for stale data
-        prices[ticker] = JSON.parse(cached).c;
-      } else {
-        const response = await fetch(
-          `${process.env.REACT_APP_SERVER_URL}/stock/quote/${ticker}`,
-        );
-        const parsed = await response.json();
-        if (!parsed.data.c) {
-          throw new Error(`Error fetching ${ticker} quote`);
-        }
-        prices[ticker] = parsed.data.c;
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/stock/quote/${ticker}`,
+      );
+      const parsed = await response.json();
+      if (!parsed.data.c) {
+        throw new Error(`Error fetching ${ticker} quote`);
       }
+      prices[ticker] = parsed.data.c;
     });
 
     await Promise.all(priceRequests);

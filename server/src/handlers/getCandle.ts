@@ -1,5 +1,6 @@
 import { Response, Request } from "express";
 import dotenv from "dotenv";
+import { redisClient } from "../services/database.service";
 
 export async function getCandle(req: Request, res: Response) {
   dotenv.config();
@@ -16,6 +17,7 @@ export async function getCandle(req: Request, res: Response) {
     );
     const data = await request.json();
     if (data["c"]) {
+      await redisClient.set(req.url, JSON.stringify(data), { EX: 180 });
       return res.status(200).json({ status: 200, data });
     } else {
       return res.status(404).json({

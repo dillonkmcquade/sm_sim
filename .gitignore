@@ -12,6 +12,9 @@ coverage
 build
 dist
 
+#redis
+dump.rdb
+
 # misc
 .DS_Store
 .env

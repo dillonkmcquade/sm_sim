@@ -1,5 +1,6 @@
 import { Response, Request } from "express";
 import dotenv from "dotenv";
+import { redisClient } from "../services/database.service";
 export async function getNews(req: Request, res: Response) {
   dotenv.config();
   const { ticker } = req.params;
@@ -12,6 +13,7 @@ export async function getNews(req: Request, res: Response) {
     );
     const data = await request.json();
     if (data.results) {
+      await redisClient.set(req.url, JSON.stringify(data));
       return res.status(200).json({ status: 200, data });
     } else {
       return res.status(404).json({

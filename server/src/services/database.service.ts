@@ -1,14 +1,20 @@
 import { MongoClient, Collection, Db } from "mongodb";
 import dotenv from "dotenv";
 import { User, Ticker } from "../types";
+import { createClient } from "redis";
 
 export const collections: {
   users?: Collection<User>;
   tickers?: Collection<Ticker>;
 } = {};
 
+export const redisClient = createClient();
+
 export async function connectToDatabase() {
   dotenv.config();
+
+  //redis
+  await redisClient.connect();
 
   //Mongo client url cannot be undefined, check before using
   let DB_STRING: string;
@@ -30,5 +36,6 @@ export async function connectToDatabase() {
 
   collections.users = userCollection;
   collections.tickers = tickerCollection;
+
   console.log(`Successfully connected to database: ${db.databaseName}`);
 }

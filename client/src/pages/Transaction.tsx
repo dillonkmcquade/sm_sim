@@ -7,7 +7,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { CircularProgress } from "@mui/material";
 
 import usePurchaseReducer from "../hooks/usePurchaseReducer";
-import useQuote from "../hooks/useQuote";
+import { useQuote } from "../hooks/useQuote";
 import Button from "../components/Button";
 import Alert from "../components/Alert";
 import { useCurrentUser } from "../context/UserContext";
