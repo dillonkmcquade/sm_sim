@@ -4,12 +4,10 @@ import { collections } from "../services/database.service";
 import type { User } from "../types";
 
 export const toggleWatchList = async (req: Request, res: Response) => {
-  const {
-    _id,
-    ticker,
-    isWatched,
-  }: { _id: string; ticker: string; isWatched: boolean } = req.body;
-  if (!ticker || !_id || isWatched === undefined) {
+  const auth = req.auth?.payload.sub;
+  const { ticker, isWatched }: { ticker: string; isWatched: boolean } =
+    req.body;
+  if (!ticker || isWatched === undefined) {
     return res.status(400).json({
       status: 400,
       data: req.body,
@@ -18,7 +16,7 @@ export const toggleWatchList = async (req: Request, res: Response) => {
   }
   try {
     const { users } = collections;
-    const user = await users?.findOne<User>({ sub: _id });
+    const user = await users?.findOne<User>({ sub: auth });
     if (!user) {
       return res.status(404).json({ status: 200, message: "user not found" });
     }
@@ -32,13 +30,13 @@ export const toggleWatchList = async (req: Request, res: Response) => {
     } else if (isWatched && !user.watchList.includes(ticker)) {
       //Add
       update = await users?.updateOne(
-        { sub: _id },
+        { sub: auth },
         { $push: { watchList: ticker } },
       );
     } else if (!isWatched && user.watchList.includes(ticker)) {
       //Remove
       update = await users?.updateOne(
-        { sub: _id },
+        { sub: auth },
         { $pull: { watchList: ticker } },
       );
     }
@@ -48,7 +46,7 @@ export const toggleWatchList = async (req: Request, res: Response) => {
         .status(400)
         .json({ status: 400, message: "Could not update user watch list" });
     }
-    const newUser = await users?.findOne<User>({ sub: _id });
+    const newUser = await users?.findOne<User>({ sub: auth });
 
     return res.status(200).json({
       status: 200,

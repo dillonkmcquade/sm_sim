@@ -4,13 +4,11 @@ import { collections } from "../services/database.service";
 import type { Holding, User } from "../types";
 
 export const buyStock = async (req: Request, res: Response) => {
+  const auth = req.auth?.payload.sub;
   const { id } = req.params;
-  const {
-    _id,
-    quantity,
-    currentPrice,
-  }: { _id: string; quantity: number; currentPrice: number } = req.body;
-  if (!id || !currentPrice || !_id) {
+  const { quantity, currentPrice }: { quantity: number; currentPrice: number } =
+    req.body;
+  if (!id || !currentPrice || quantity <= 0) {
     return res.status(400).json({
       status: 400,
       data: req.body,
@@ -20,7 +18,7 @@ export const buyStock = async (req: Request, res: Response) => {
   }
   try {
     const { users } = collections;
-    const user = await users?.findOne<User>({ sub: _id });
+    const user = await users?.findOne<User>({ sub: auth });
     if (!user) {
       return res.status(404).json({ status: 200, message: "user not found" });
     }
@@ -35,7 +33,7 @@ export const buyStock = async (req: Request, res: Response) => {
     }
 
     const update = await users?.updateOne(
-      { sub: _id },
+      { sub: auth },
       { $inc: { balance: -amountToSubtract }, $push: { holdings: newHolding } },
     );
 

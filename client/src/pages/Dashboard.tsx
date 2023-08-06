@@ -24,7 +24,7 @@ export default function Dashboard() {
         const { REACT_APP_SERVER_URL } = process.env;
         const accessToken = await getAccessTokenSilently();
         const response = await fetch(
-          `${REACT_APP_SERVER_URL}/user/${user?.sub}`,
+          `${REACT_APP_SERVER_URL}/user`,
           {
             method: "GET",
             headers: {

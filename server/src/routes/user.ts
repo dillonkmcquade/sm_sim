@@ -17,8 +17,8 @@ userRouter
   .use(jwtCheck)
   .post("/", createUser)
   .delete("/", deleteUser)
-  .patch("/update/:_id", updateUser)
-  .get("/:_id", getUser)
+  .patch("/update", updateUser)
+  .get("/", getUser)
   .patch("/toggleWatchList", toggleWatchList);
 
 export default userRouter;

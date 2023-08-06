@@ -16,7 +16,7 @@ import type { User, Holding} from "../types";
 
 export default function Transaction() {
   const { id, transactionType } = useParams();
-  const { user, getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
 
   const {
@@ -94,9 +94,8 @@ export default function Transaction() {
           "Content-type": "application/json",
         },
         body: JSON.stringify({
-          _id: user?.sub, //user UUID
           quantity: Number(quantity),
-          currentPrice: quote!.c,
+          currentPrice: quote!.c, //not secure
         }),
       });
       const parsed = await response.json();

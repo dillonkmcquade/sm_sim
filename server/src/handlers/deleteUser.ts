@@ -3,14 +3,10 @@ import { Response, Request } from "express";
 import { collections } from "../services/database.service";
 
 export const deleteUser = async (req: Request, res: Response) => {
-  const { _id } = req.body;
-  if (!_id) {
-    return res.status(400).json({ status: 400, message: "Missing client ID" });
-  }
-
+  const auth = req.auth?.payload.sub;
   try {
     const { users } = collections;
-    const update = await users?.deleteOne({ sub: _id });
+    const update = await users?.deleteOne({ sub: auth });
     if (update?.deletedCount === 0) {
       return res.status(404).json({
         status: 404,

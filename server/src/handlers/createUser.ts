@@ -5,13 +5,14 @@ import { ObjectId } from "mongodb";
 import { User } from "../types";
 
 export const createUser = async (req: Request, res: Response) => {
+  const auth = req.auth?.payload.sub;
   const { user } = req.body;
   if (!user) {
     return res.status(400).json({ status: 400, message: "missing user UUID" });
   }
   try {
     const { users } = collections;
-    const duplicate = await users?.findOne<User>({ sub: user.sub });
+    const duplicate = await users?.findOne<User>({ sub: auth });
     if (duplicate) {
       return res
         .status(200)

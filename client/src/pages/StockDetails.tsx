@@ -22,7 +22,7 @@ import Alert from "../components/Alert";
 export default function StockDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { getAccessTokenSilently, isAuthenticated, user } = useAuth0();
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
   //custom hooks
   const { quote } = useQuote(id!);
@@ -53,7 +53,7 @@ export default function StockDetails() {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ _id: user?.sub, ticker: id, isWatched }),
+        body: JSON.stringify({ ticker: id, isWatched }),
       });
       const parsed = await response.json();
       if (parsed.status === 200) {

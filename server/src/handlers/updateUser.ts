@@ -4,10 +4,7 @@ import { collections } from "../services/database.service";
 import type { Update, User } from "../types";
 
 export const updateUser = async (req: Request, res: Response) => {
-  const { _id } = req.params;
-  if (!_id) {
-    return res.status(400).json({ status: 400, message: "Missing client ID" });
-  }
+  const auth = req.auth?.payload.sub;
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({
       status: 400,
@@ -44,7 +41,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
   try {
     const { users } = collections;
-    const update = await users?.updateOne({ sub: _id }, { $set: req.body });
+    const update = await users?.updateOne({ sub: auth }, { $set: req.body });
     if (update?.matchedCount === 0 || update?.modifiedCount === 0) {
       return res.status(404).json({
         status: 404,
@@ -52,7 +49,7 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
-    const newUser = await users?.findOne<User>({ sub: _id });
+    const newUser = await users?.findOne<User>({ sub: auth });
 
     return res.status(200).json({
       status: 200,

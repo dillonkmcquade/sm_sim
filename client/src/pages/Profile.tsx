@@ -27,7 +27,7 @@ export default function Profile() {
       setLoading();
       const accessToken = await getAccessTokenSilently();
       const response = await fetch(
-        `${REACT_APP_SERVER_URL}/user/update/${currentUser?.sub}`,
+        `${REACT_APP_SERVER_URL}/user/update`,
         {
           method: "PATCH",
           headers: {
