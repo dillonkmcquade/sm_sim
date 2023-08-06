@@ -10,7 +10,7 @@ import { queryTickerByName } from "./handlers/queryTickerByName";
 import userRouter from "./routes/user";
 import transactionRouter from "./routes/transaction";
 import stockRouter from "./routes/stock";
-import { checkCache } from "./utils";
+import { checkCache } from "./middleware";
 
 dotenv.config();
 
