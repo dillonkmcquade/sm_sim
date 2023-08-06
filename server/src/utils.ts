@@ -1,7 +1,7 @@
 import { redisClient } from "./services/database.service";
 
 export async function getPrice(symbol: string) {
-  const price = await redisClient.get(symbol);
+  const price = await redisClient.get(`/stock/quote?symbol=${symbol}`);
   if (price) {
     return JSON.parse(price);
   }

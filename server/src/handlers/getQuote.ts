@@ -13,7 +13,7 @@ export async function getQuote(req: Request, res: Response) {
     );
     const data = await request.json();
     if (data["c"]) {
-      await redisClient.set(ticker, JSON.stringify(data), { EX: 60 });
+      await redisClient.set(req.url, JSON.stringify(data), { EX: 60 });
       return res.status(200).json({ status: 200, data });
     } else {
       return res.status(404).json({
