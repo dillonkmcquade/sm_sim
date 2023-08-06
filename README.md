@@ -3,9 +3,20 @@
 ![Dashboard](assets/dashboard.png)
 ![Stock Detail page](assets/stockDetails.png)
 
-MarketSim is a stock market simulator created using react, express, TypeScript(for the server), and MongoDB. MarketSim was designed to be mobile-first, but also desktop friendly. The main goal of this project is to allow users to practice making investments without the risk of the real-world stock market. Feel free to make mistakes and try new things, because it's just a simulation.
+MarketSim is a stock market simulator created using react, express, TypeScript(for the server), and MongoDB(& Redis for caching requests). MarketSim was designed to be mobile-first, but also desktop friendly. The main goal of this project is to allow users to practice making investments without the risk of the real-world stock market. Feel free to make mistakes and try new things, because it's just a simulation.
 
-## Features
+## Tech Features
+
+- Front-end created with React & styled-components
+- Mobile-first design
+- Front and back-end 100% Typescript
+- REST API using Express.js
+- Cloud-hosted MongoDB atlas database
+- Server side request caching with Redis
+- Data visuals with Nivo.rocks
+- JWT based session authentication (implemented by Auth0)
+
+## User Features
 
 - Search and gather information on up to 21,000 publically traded companies using MongoDB atlas search indexes.
 
