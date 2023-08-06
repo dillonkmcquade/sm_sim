@@ -2,13 +2,13 @@
 import { Response, Request } from "express";
 import { collections } from "../services/database.service";
 import { Holding, User } from "../types";
+import { getPrice } from "../utils";
 
 export const sellStock = async (req: Request, res: Response) => {
   const auth = req.auth?.payload.sub;
   const { id } = req.params;
-  const { quantity, currentPrice }: { quantity: number; currentPrice: number } =
-    req.body;
-  if (!id || !currentPrice || !id) {
+  const { quantity }: { quantity: number } = req.body;
+  if (!id || quantity <= 0) {
     return res.status(400).json({
       status: 400,
       data: req.body,
@@ -18,6 +18,7 @@ export const sellStock = async (req: Request, res: Response) => {
   }
   try {
     const { users } = collections;
+    const currentPrice = await getPrice(id);
     const user = await users?.findOne<User>({ sub: auth });
     if (!user) {
       return res.status(404).json({ status: 200, message: "user not found" });

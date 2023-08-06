@@ -95,7 +95,6 @@ export default function Transaction() {
         },
         body: JSON.stringify({
           quantity: Number(quantity),
-          currentPrice: quote!.c, //not secure
         }),
       });
       const parsed = await response.json();
