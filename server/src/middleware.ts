@@ -11,7 +11,6 @@ export async function checkCache(
 
   const cached = await redisClient.get(url);
   if (cached) {
-    console.log(`Using cache for request: ${url}`);
     return res
       .status(200)
       .json({ status: 200, fromCache: true, data: JSON.parse(cached) });
