@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { redisClient } from "./services/database.service";
+import { auth } from "express-oauth2-jwt-bearer";
 
 export async function checkCache(
   req: Request,
@@ -18,3 +19,8 @@ export async function checkCache(
     return next();
   }
 }
+
+export const jwtCheck = auth({
+  audience: "my-api",
+  issuerBaseURL: "https://dev-twp4lk0d7utxiu7i.us.auth0.com/",
+});

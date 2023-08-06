@@ -23,15 +23,10 @@ export async function connectToDatabase() {
   } else {
     throw new Error("DB_CONN_STRING does not exist");
   }
-
   const client: MongoClient = new MongoClient(DB_STRING);
-
   await client.connect();
-
   const db: Db = client.db(process.env.DB_NAME);
-
   const userCollection: Collection<User> = db.collection("users");
-
   const tickerCollection: Collection<Ticker> = db.collection("tickers");
 
   collections.users = userCollection;
