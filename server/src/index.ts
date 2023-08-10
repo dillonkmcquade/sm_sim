@@ -35,11 +35,19 @@ connectToDatabase()
         return res.send("<h1>Does not exist</h1>");
       });
 
-    server.listen(PORT, () => {
+    const app = server.listen(PORT, () => {
       console.log("Listening on port %d", PORT);
+    });
+    process.on("SIGTERM", () => {
+      console.log("Shutting down gracefully...");
+      setTimeout(() => {
+        app.close(() => {
+          process.exit();
+        });
+      }, 5000);
     });
   })
   .catch((error: Error) => {
     console.error("Database connection failed", error);
-    process.exit();
+    process.exit(1);
   });
