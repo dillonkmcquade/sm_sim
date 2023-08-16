@@ -1,5 +1,11 @@
+/*
+ *
+ * Connect to database and redis client, export collections to be used in db queries
+ *
+ */
+
 import { MongoClient, Collection, Db } from "mongodb";
-import dotenv from "dotenv";
+import "dotenv/config";
 import { User, Ticker } from "../types";
 import { createClient } from "redis";
 
@@ -11,8 +17,6 @@ export const collections: {
 export const redisClient = createClient({ url: process.env.REDIS_CLIENT });
 
 export async function connectToDatabase() {
-  dotenv.config();
-
   //redis
   await redisClient.connect();
 
@@ -23,12 +27,15 @@ export async function connectToDatabase() {
   } else {
     throw new Error("DB_CONN_STRING does not exist");
   }
+
+  // Create and connect to mongo
   const client: MongoClient = new MongoClient(DB_STRING);
   await client.connect();
   const db: Db = client.db(process.env.DB_NAME);
+
+  // store collections in exported collections object
   const userCollection: Collection<User> = db.collection("users");
   const tickerCollection: Collection<Ticker> = db.collection("tickers");
-
   collections.users = userCollection;
   collections.tickers = tickerCollection;
 

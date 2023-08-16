@@ -1,3 +1,29 @@
+/*
+ * GET /search?name={}
+ *
+ * Returns a search results based on user input
+ *
+ * 200:
+ *  Response {
+ *   status      number
+ *   data      Result[]  // see front-end types.d.ts for interface
+ *  }
+ * 400:
+ *  Response {
+ *   status      number
+ *   message     string
+ *  }
+ * 404:
+ *  Response {
+ *   status      number
+ *   message     string
+ *  }
+ * 500:
+ *  Response {
+ *   status      number
+ *   message     string
+ *  }
+ */
 "use strict";
 import { Response, Request } from "express";
 import { collections, redisClient } from "../services/database.service";
@@ -12,6 +38,8 @@ export const queryTickerByName = async (req: Request, res: Response) => {
   }
   const { tickers } = collections;
   try {
+    // MongoDB search index allows us to query documents by matching user input
+    // Try querying by symbol first
     const agg = [
       {
         $search: {
@@ -26,6 +54,8 @@ export const queryTickerByName = async (req: Request, res: Response) => {
       { $project: { symbol: 1, description: 1 } },
     ];
     let data = await tickers?.aggregate<Ticker>(agg).toArray();
+
+    // Try querying by description if no results found
     if (data?.length === 0) {
       data = await tickers
         ?.aggregate<Ticker>([
@@ -43,10 +73,16 @@ export const queryTickerByName = async (req: Request, res: Response) => {
         ])
         .toArray();
     }
+
+    // return not found if no results
     if (data?.length === 0) {
-      return res.status(400).json({ status: 400, message: "Not found" });
+      return res.status(404).json({ status: 404, message: "Not found" });
     }
+
+    // cache results
     await redisClient.set(req.url, JSON.stringify(data));
+
+    // return data
     return res.status(200).json({
       status: 200,
       data,

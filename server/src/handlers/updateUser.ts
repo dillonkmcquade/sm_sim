@@ -1,3 +1,31 @@
+/*
+ * PATCH /user
+ *
+ * Updates user details
+ *
+ * Returns new user object
+ *
+ * 200:
+ *  Response {
+ *   status      number
+ *   data          User
+ *  }
+ * 400:
+ *  Response {
+ *   status      number
+ *   message     string
+ *  }
+ * 404:
+ *  Response {
+ *   status      number
+ *   message     string
+ *  }
+ * 500:
+ *  Response {
+ *   status      number
+ *   message     string
+ *  }
+ */
 "use strict";
 import { Response, Request } from "express";
 import { collections } from "../services/database.service";
@@ -9,7 +37,6 @@ export const updateUser = async (req: Request, res: Response) => {
     return res.status(400).json({
       status: 400,
       message: "No update paramaters given.",
-      data: req.body,
     });
   }
 
@@ -32,6 +59,8 @@ export const updateUser = async (req: Request, res: Response) => {
     });
     return result;
   }
+
+  // if it fails the test, return bad request
   if (!isUpdate(req.body)) {
     return res.status(400).json({
       status: 400,
@@ -41,7 +70,11 @@ export const updateUser = async (req: Request, res: Response) => {
 
   try {
     const { users } = collections;
+
+    // update user
     const update = await users?.updateOne({ sub: auth }, { $set: req.body });
+
+    // handle DB errors
     if (update?.matchedCount === 0 || update?.modifiedCount === 0) {
       return res.status(404).json({
         status: 404,
@@ -49,11 +82,12 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
+    // retrieve new user object
     const newUser = await users?.findOne<User>({ sub: auth });
 
+    //return updated user object
     return res.status(200).json({
       status: 200,
-      message: "User updated successfully.",
       data: newUser,
     });
   } catch (error) {

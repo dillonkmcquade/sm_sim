@@ -38,6 +38,7 @@ connectToDatabase()
     const app = server.listen(PORT, () => {
       console.log("Listening on port %d", PORT);
     });
+
     process.on("SIGTERM", () => {
       console.log("Shutting down gracefully...");
       setTimeout(() => {

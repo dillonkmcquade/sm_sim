@@ -1,3 +1,24 @@
+/*
+ * GET /user
+ *
+ * Returns a user object
+ *
+ * 200:
+ *  Response {
+ *   status      number
+ *   data          User  // see front-end types.d.ts for interface
+ *  }
+ * 404:
+ *  Response {
+ *   status      number
+ *   message     string
+ *  }
+ * 500:
+ *  Response {
+ *   status      number
+ *   message     string
+ *  }
+ */
 "use strict";
 import { Response, Request } from "express";
 import { collections } from "../services/database.service";
