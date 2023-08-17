@@ -44,8 +44,10 @@ export default function Profile() {
       } else {
         errorMessage("Nothing to change");
       }
-    } catch (error: any) {
-      errorMessage(error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        errorMessage(error.message);
+      }
     }
   };
 

@@ -78,7 +78,7 @@ interface Quote {
   dp: string;
 }
 interface ButtonProps {
-  handler?: MouseEvent | any;
+  handler?: any;
   hovercolor?: string;
   children: React.ReactNode;
   bg?: string;

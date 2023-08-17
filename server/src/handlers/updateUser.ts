@@ -41,23 +41,16 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 
   //limit the updateable user fields
-  function isUpdate(obj: any): boolean {
-    const dummyData: Update = {
-      name: "string",
-      nickname: "string",
-      email: "string",
-      address: "string",
-      telephone: "string",
-    };
-    let result = true;
+  function isUpdate(obj: Update): boolean {
+    const dumData = new Set<string>([
+      "name",
+      "nickname",
+      "email",
+      "address",
+      "telephone",
+    ]);
     const keys = Object.keys(obj);
-    keys.forEach((key) => {
-      const expectedKeys = Object.keys(dummyData);
-      if (!expectedKeys.includes(key)) {
-        result = false;
-      }
-    });
-    return result;
+    return keys.some((key) => !dumData.has(key));
   }
 
   // if it fails the test, return bad request
@@ -71,7 +64,7 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const { users } = collections;
 
-    // update user
+    // update given fields in DB
     const update = await users?.updateOne({ sub: auth }, { $set: req.body });
 
     // handle DB errors
