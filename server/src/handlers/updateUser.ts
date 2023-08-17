@@ -50,7 +50,7 @@ export const updateUser = async (req: Request, res: Response) => {
       "telephone",
     ]);
     const keys = Object.keys(obj);
-    return keys.some((key) => !dumData.has(key));
+    return keys.every((key) => dumData.has(key));
   }
 
   // if it fails the test, return bad request
