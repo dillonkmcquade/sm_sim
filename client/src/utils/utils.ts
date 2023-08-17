@@ -4,20 +4,20 @@
 import type { Holding } from "../types";
 
 //price = purchase price
-export function getInvestedValue(holdings: Holding[]) {
+export function getInvestedValue(holdings: Holding[]): number {
   return holdings.reduce((accumulator, currentValue) => {
     return accumulator + Number(currentValue.quantity) * currentValue.price;
   }, 0);
 }
 
-//create object containing {ticker: price} combinations
-export async function getPrices(holdings: Holding[]) {
-  const prices: { [key: string]: number } = {};
-  const uniqueTickers = Array.from(
-    new Set(holdings.map((holding) => holding.ticker)),
-  );
+//create map containing {ticker, price} combinations
+export async function getPrices(
+  holdings: Holding[],
+): Promise<Map<string, number>> {
+  const prices = new Map<string, number>();
+  const uniqueTickers = new Set(holdings.map((holding) => holding.ticker));
   try {
-    const priceRequests = uniqueTickers.map(async (ticker) => {
+    const priceRequests = [...uniqueTickers].map(async (ticker) => {
       const response = await fetch(
         `${process.env.REACT_APP_SERVER_URL}/stock/quote/${ticker}`,
       );
@@ -25,7 +25,7 @@ export async function getPrices(holdings: Holding[]) {
       if (!parsed.data.c) {
         throw new Error(`Error fetching ${ticker} quote`);
       }
-      prices[ticker] = parsed.data.c;
+      prices.set(ticker, parsed.data.c);
     });
 
     await Promise.all(priceRequests);
@@ -38,38 +38,42 @@ export async function getPrices(holdings: Holding[]) {
 }
 
 //returns total value of holdings
-export async function getTotalValue(holdings: Holding[]) {
+export async function getTotalValue(holdings: Holding[]): Promise<number> {
   const prices = await getPrices(holdings);
 
   return holdings.reduce((accumulator: number, currentValue: Holding) => {
-    return accumulator + currentValue.quantity * prices[currentValue.ticker];
+    const price = prices.get(currentValue.ticker);
+    if (!price) {
+      throw new Error("Missing price");
+    }
+    return accumulator + currentValue.quantity * price;
   }, 0);
 }
 
-export function getUniques(holdings: Holding[]) {
-  const uniqueValues: any = {};
+// narrow holdings to holdings with acummulated quantity > 0
+// Some holdings might have negative quantity in the case of a sell transaction
+// So we have to add up all the positive and negatives of each ticker symbol to get the # of shares
+//
+// Returns a map
+export function getUniques(holdings: Holding[]): Map<string, number> {
+  //accumulate quantity and store in map
+  const uniqueValues = new Map<string, number>();
   for (let i = 0; i < holdings.length; i++) {
     const holding = holdings[i];
-    if (uniqueValues[holding.ticker]) {
-      uniqueValues[holding.ticker] += holding.quantity;
+    const value = uniqueValues.get(holding.ticker);
+    if (value) {
+      uniqueValues.set(holding.ticker, value + holding.quantity);
     } else {
-      uniqueValues[holding.ticker] = holding.quantity;
+      uniqueValues.set(holding.ticker, holding.quantity);
     }
   }
-
-  const uniqueTickers = Object.keys(uniqueValues);
-  const newArr: { ticker: string; quantity: number }[] = new Array(
-    uniqueTickers.length,
-  );
-
-  for (let i = 0; i < uniqueTickers.length; i++) {
-    const ticker = uniqueTickers[i];
-    const quantity = uniqueValues[ticker];
-    if (quantity <= 0 || quantity === undefined) continue;
-    newArr[i] = { ticker, quantity };
-  }
-
-  return newArr.filter(Boolean);
+  // remove quantities less than 0
+  uniqueValues.forEach((value, key) => {
+    if (value < 0) {
+      uniqueValues.delete(key);
+    }
+  });
+  return uniqueValues;
 }
 
 export function debounce(fn: Function, t: number) {

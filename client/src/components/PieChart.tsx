@@ -6,11 +6,11 @@ export default function PieChart({ data }: {data: User}) {
   //Format data to satisfy nivo
   const formatted = (data: User) => {
     const uniques = getUniques(data.holdings);
-    const newData = uniques.map((key) => {
+    const newData = [ ...uniques ].map((key) => {
       return {
-        id: key.ticker,
-        value: key.quantity,
-        label: key.ticker,
+        id: key[0],
+        value: key[1],
+        label: key[0],
         color: `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(
           Math.random() * 255,
         )}, ${Math.floor(Math.random() * 255)})`,

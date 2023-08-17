@@ -84,6 +84,10 @@ export default function Transaction() {
       errorMessage("Insufficient funds");
       return
     }
+    if (quote && action === "buy" && currentUser.balance < (quote.c * quantity)) {
+      errorMessage("Insufficient funds")
+      return
+    }
     try {
       setLoading();
       const accessToken = await getAccessTokenSilently();
@@ -111,6 +115,8 @@ export default function Transaction() {
         setTimeout(() => {
           navigate(`/dashboard`);
         }, 1000);
+      }else {
+        errorMessage(parsed.message)
       }
     } catch (error: any) {
       errorMessage(error.message);
@@ -183,6 +189,7 @@ export default function Transaction() {
           loading ||
           confirmed ||
           balance <= 0 ||
+          action === "buy" && balance < (quote.c * quantity) ||
           (action === "sell" && shares === 0)
         }
         bradius="0"

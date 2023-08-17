@@ -123,11 +123,11 @@ export default function Dashboard() {
         {currentUser.holdings.length === 0 ? (
           <FourOhFour>Nothing here yet.</FourOhFour>
         ) : (
-          getUniques(currentUser.holdings).map((holding) => (
+          [ ...getUniques(currentUser.holdings) ].map((holding) => (
             <TickerCard
-              handler={() => navigate(`/research/${holding.ticker}`)}
-              key={holding.ticker}
-              ticker={holding.ticker}
+              handler={() => navigate(`/research/${holding[0]}`)}
+              key={holding[0]}
+              ticker={holding[0]}
             />
           ))
         )}
