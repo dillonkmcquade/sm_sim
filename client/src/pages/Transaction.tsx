@@ -189,7 +189,7 @@ export default function Transaction() {
           loading ||
           confirmed ||
           balance <= 0 ||
-          action === "buy" && balance < (quote.c * quantity) ||
+          ( action === "buy" && balance < (quote.c * quantity) ) ||
           (action === "sell" && shares === 0)
         }
         bradius="0"
