@@ -2,7 +2,7 @@ import {  useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 import { IconButton } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { VisibilityOutlined } from "@mui/icons-material";
@@ -104,9 +104,13 @@ export default function StockDetails() {
         {id}
         <IconButton onClick={() => toggleWatched()}>
           {isWatched ? (
-            <VisibilityIcon fontSize="small" sx={{ color: "white" }} />
+              <Tooltip title="Remove from watch list" placement="right">
+                <VisibilityIcon fontSize="small" sx={{ color: "white" }} />
+              </Tooltip>
           ) : (
-            <VisibilityOutlined fontSize="small" sx={{ color: "white" }} />
+                <Tooltip title="Add to watch list" placement="right">
+                  <VisibilityOutlined fontSize="small" sx={{ color: "white" }} />
+                </Tooltip>
           )}
         </IconButton>
       </TickerName>
