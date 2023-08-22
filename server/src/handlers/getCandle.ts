@@ -21,7 +21,6 @@
  */
 
 import { Response, Request } from "express";
-import "dotenv/config";
 import { redisClient } from "../services/database.service";
 
 export async function getCandle(req: Request, res: Response) {

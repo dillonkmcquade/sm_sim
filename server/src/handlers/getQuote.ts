@@ -25,7 +25,6 @@
  *  }
  */
 import { Response, Request } from "express";
-import "dotenv/config";
 import { redisClient } from "../services/database.service";
 
 export async function getQuote(req: Request, res: Response) {

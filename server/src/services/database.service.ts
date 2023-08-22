@@ -5,7 +5,6 @@
  */
 
 import { MongoClient, Collection, Db } from "mongodb";
-import "dotenv/config";
 import { User, Ticker } from "../types";
 import { createClient } from "redis";
 
