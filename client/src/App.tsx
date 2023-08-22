@@ -4,7 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { GlobalStyles } from "./GlobalStyles";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import {useCurrentUser} from "./context/UserContext";
+import { useCurrentUser } from "./context/UserContext";
 
 import Header from "./components/Header";
 import Menu from "./components/Menu";
@@ -14,7 +14,7 @@ import StockDetails from "./pages/StockDetails";
 import Research from "./pages/Research";
 import Transaction from "./pages/Transaction";
 import Profile from "./pages/Profile";
-import { getTotalValue } from "./utils/utils";
+import { getPrices, getTotalValue } from "./utils/utils";
 
 export default function App() {
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
@@ -35,7 +35,9 @@ export default function App() {
         });
         const response = await request.json();
         if (response.status === 200 || response.status === 201) {
-          const total = await getTotalValue(response.data.holdings);
+          const holdings = response.data.holdings;
+          const prices = await getPrices(holdings);
+          const total = getTotalValue(holdings, prices);
           setCurrentUser({ ...response.data, total, timestamp: Date.now() });
         }
       } catch (err) {
@@ -47,7 +49,13 @@ export default function App() {
     if (isAuthenticated && !currentUser) {
       authenticateUser();
     }
-  }, [getAccessTokenSilently, user, setCurrentUser, isAuthenticated, currentUser]);
+  }, [
+    getAccessTokenSilently,
+    user,
+    setCurrentUser,
+    isAuthenticated,
+    currentUser,
+  ]);
 
   return (
     <>

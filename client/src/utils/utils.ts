@@ -38,12 +38,15 @@ export async function getPrices(
 }
 
 //returns total value of holdings
-export async function getTotalValue(holdings: Holding[]): Promise<number> {
-  const prices = await getPrices(holdings);
+export function getTotalValue(
+  holdings: Holding[],
+  prices: Map<string, number>,
+): number {
+  // const prices = await getPrices(holdings);
 
   return holdings.reduce((accumulator: number, currentValue: Holding) => {
     const price = prices.get(currentValue.ticker);
-    if (!price) {
+    if (price === undefined) {
       throw new Error("Missing price");
     }
     return accumulator + currentValue.quantity * price;
@@ -69,7 +72,7 @@ export function getUniques(holdings: Holding[]): Map<string, number> {
   }
   // remove quantities less than 0
   uniqueValues.forEach((value, key) => {
-    if (value < 0) {
+    if (value <= 0) {
       uniqueValues.delete(key);
     }
   });

@@ -1,10 +1,13 @@
-import {  useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
-
-import { getTotalValue, getInvestedValue, getUniques } from "../utils/utils";
-
+import {
+  getTotalValue,
+  getInvestedValue,
+  getUniques,
+  getPrices,
+} from "../utils/utils";
 import PieChart from "../components/PieChart";
 import TickerCard from "../components/TickerCard";
 import { CircularProgress } from "@mui/material";
@@ -15,7 +18,7 @@ import type { User } from "../types";
 export default function Dashboard() {
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
   const navigate = useNavigate();
-  const { currentUser, setCurrentUser } = useCurrentUser(); 
+  const { currentUser, setCurrentUser } = useCurrentUser();
 
   //get user object from backend
   useEffect(() => {
@@ -23,23 +26,21 @@ export default function Dashboard() {
       try {
         const { REACT_APP_SERVER_URL } = process.env;
         const accessToken = await getAccessTokenSilently();
-        const response = await fetch(
-          `${REACT_APP_SERVER_URL}/user`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
+        const response = await fetch(`${REACT_APP_SERVER_URL}/user`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
           },
-        );
+        });
         const { data } = await response.json();
         if (data?.holdings?.length === 0) return;
-        const total = await getTotalValue(data?.holdings); //potentially expensive function call
-        const modifiedObj: User = { ...data, total, timestamp: Date.now()  };
+        const prices = await getPrices(data?.holdings);
+        const total = getTotalValue(data?.holdings, prices); //potentially expensive function call
+        const modifiedObj: User = { ...data, total, timestamp: Date.now() };
         setCurrentUser(modifiedObj);
       } catch (err) {
-        if (err instanceof Error){
+        if (err instanceof Error) {
           console.error(err.message);
         }
       }
@@ -51,10 +52,16 @@ export default function Dashboard() {
     //Currently making separate api call to get the price of each stock,
     //This could get costly if the portfolio is large. Therefore we will
     //limit this by doing it once, caching it, and updating every 15 mins
-    if (!currentUser || Date.now() - Number( currentUser.timestamp! ) > 300000) {
+    if (!currentUser || Date.now() - Number(currentUser.timestamp!) > 300000) {
       getUser();
     }
-  }, [setCurrentUser, currentUser, user, isAuthenticated, getAccessTokenSilently]);
+  }, [
+    setCurrentUser,
+    currentUser,
+    user,
+    isAuthenticated,
+    getAccessTokenSilently,
+  ]);
 
   const investedValue = currentUser
     ? getInvestedValue(currentUser.holdings)
@@ -123,7 +130,7 @@ export default function Dashboard() {
         {currentUser.holdings.length === 0 ? (
           <FourOhFour>Nothing here yet.</FourOhFour>
         ) : (
-          [ ...getUniques(currentUser.holdings) ].map((holding) => (
+          [...getUniques(currentUser.holdings)].map((holding) => (
             <TickerCard
               handler={() => navigate(`/research/${holding[0]}`)}
               key={holding[0]}

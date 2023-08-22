@@ -11,8 +11,8 @@ import { useQuote } from "../hooks/useQuote";
 import Button from "../components/Button";
 import Alert from "../components/Alert";
 import { useCurrentUser } from "../context/UserContext";
-import { getTotalValue } from "../utils/utils";
-import type { User, Holding} from "../types";
+import { getPrices, getTotalValue } from "../utils/utils";
+import type { User, Holding } from "../types";
 
 export default function Transaction() {
   const { id, transactionType } = useParams();
@@ -28,7 +28,7 @@ export default function Transaction() {
     state,
   } = usePurchaseReducer(transactionType!);
 
-  const { currentUser, setCurrentUser } = useCurrentUser() 
+  const { currentUser, setCurrentUser } = useCurrentUser();
   const { confirmed, quantity, action, loading, error } = state;
   const { quote } = useQuote(id!);
   const [alignment, setAlignment] = useState(transactionType);
@@ -36,25 +36,27 @@ export default function Transaction() {
   const { balance } = currentUser;
 
   useEffect(() => {
-        const numOfShares = currentUser.holdings.reduce(
-          (accumulator: number, currentValue: Holding) => {
-            if (currentValue.ticker === id) {
-              return accumulator + currentValue.quantity;
-            } else {
-              return accumulator + 0;
-            }
-          },
-          0,
-        );
-
-        if (numOfShares >= 0) {
-          setShares(numOfShares);
+    const numOfShares = currentUser.holdings.reduce(
+      (accumulator: number, currentValue: Holding) => {
+        if (currentValue.ticker === id) {
+          return accumulator + currentValue.quantity;
+        } else {
+          return accumulator + 0;
         }
-    
-  }, [ currentUser, id ]);
+      },
+      0,
+    );
+
+    if (numOfShares >= 0) {
+      setShares(numOfShares);
+    }
+  }, [currentUser, id]);
 
   //toggling buy/sell buttons
-  const toggleAction = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
+  const toggleAction = (
+    _event: React.MouseEvent<HTMLElement>,
+    newAlignment: string,
+  ) => {
     if (newAlignment === "sell" && quantity > shares) {
       updateQuantity(shares);
     }
@@ -64,15 +66,15 @@ export default function Transaction() {
 
   //changing quantity via number input
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (Number( event.target.value) * quote!.c  > balance) {
+    if (Number(event.target.value) * quote!.c > balance) {
       errorMessage("Insufficient funds");
       return;
     } else {
-      updateQuantity(Number( event.target.value ));
+      updateQuantity(Number(event.target.value));
     }
   };
 
-  //patch to /${action}/:id endpoint
+  //PATCH to /transaction/${action}/:id endpoint
   const submit = async () => {
     if (quantity < 1) {
       return errorMessage("Invalid quantity");
@@ -81,43 +83,44 @@ export default function Transaction() {
       return errorMessage("You cannot sell this many shares");
     }
     if (action === "buy" && currentUser.balance <= 0) {
-      errorMessage("Insufficient funds");
-      return
+      return errorMessage("Insufficient funds");
     }
-    if (quote && action === "buy" && currentUser.balance < (quote.c * quantity)) {
-      errorMessage("Insufficient funds")
-      return
+    if (quote && action === "buy" && currentUser.balance < quote.c * quantity) {
+      return errorMessage("Insufficient funds");
     }
     try {
       setLoading();
       const accessToken = await getAccessTokenSilently();
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/transaction/${action}/${id}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-type": "application/json",
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/transaction/${action}/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            quantity: Number(quantity),
+          }),
         },
-        body: JSON.stringify({
-          quantity: Number(quantity),
-        }),
-      });
+      );
       const parsed = await response.json();
-      if (parsed.status === 200) {
-        const newTotal = await getTotalValue(parsed.holdings);
-        const newUserObj: User = {
-          ...currentUser,
-          holdings: parsed.holdings,
-          balance: parsed.balance,
-          total: newTotal,
-        };
-        setCurrentUser(newUserObj);
-        success();
-        setTimeout(() => {
-          navigate(`/dashboard`);
-        }, 1000);
-      }else {
-        errorMessage(parsed.message)
+      if (parsed.status !== 200) {
+        return errorMessage(parsed.message);
       }
+      const prices = await getPrices(parsed.holdings);
+      const newTotal = getTotalValue(parsed.holdings, prices);
+      const newUserObj: User = {
+        ...currentUser,
+        holdings: parsed.holdings,
+        balance: parsed.balance,
+        total: newTotal,
+      };
+      setCurrentUser(newUserObj);
+      success();
+      setTimeout(() => {
+        navigate(`/dashboard`);
+      }, 1000);
     } catch (error: any) {
       errorMessage(error.message);
     }
@@ -153,12 +156,8 @@ export default function Transaction() {
         onChange={toggleAction}
         aria-label="Platform"
       >
-        <Buy value="buy">
-          Buy
-        </Buy>
-        <Sell value="sell">
-          Sell
-        </Sell>
+        <Buy value="buy">Buy</Buy>
+        <Sell value="sell">Sell</Sell>
       </ToggleButtonGroup>
       <TransactionDetails>
         <h3>
@@ -189,7 +188,7 @@ export default function Transaction() {
           loading ||
           confirmed ||
           balance <= 0 ||
-          ( action === "buy" && balance < (quote.c * quantity) ) ||
+          (action === "buy" && balance < quote.c * quantity) ||
           (action === "sell" && shares === 0)
         }
         bradius="0"
@@ -236,8 +235,7 @@ const Sell = styled(Buy)`
   &.MuiButtonBase-root.Mui-selected {
     color: #d63c44;
   }
-
-`
+`;
 
 const Detail = styled.div`
   display: flex;

@@ -1,4 +1,4 @@
-import { getUniques, getInvestedValue } from "../utils/utils";
+import { getUniques, getInvestedValue, getTotalValue } from "../utils/utils";
 
 const holdings = [
   { ticker: "BRK.A", quantity: 1, price: 523500 },
@@ -15,23 +15,58 @@ const holdings1 = [
   { ticker: "BRK.A", quantity: -1, price: 523500 },
   { ticker: "BRK.A", quantity: -1, price: 523500 },
 ];
+const holdings3 = [
+  { ticker: "BRK.A", quantity: 1, price: 523500 },
+  { ticker: "BRK.A", quantity: -1, price: 523500 },
+];
 
 describe("testing getUniques", () => {
   test("testing for quantities === 0", () => {
-    expect(getUniques(holdings)).toEqual([
-      { ticker: "TSLA", quantity: 1001 },
-      { ticker: "AAPL", quantity: 1 },
+    const expected = new Map([
+      ["TSLA", 1001],
+      ["AAPL", 1],
     ]);
+    expect(getUniques(holdings)).toEqual(expected);
   });
   test("testing for negative quantities", () => {
-    expect(getUniques(holdings1)).toEqual([
-      { ticker: "TSLA", quantity: 1001 },
-      { ticker: "AAPL", quantity: 1 },
+    const expected = new Map([
+      ["TSLA", 1001],
+      ["AAPL", 1],
     ]);
+    expect(getUniques(holdings1)).toEqual(expected);
+  });
+  test("testing for empty holdings", () => {
+    expect(getUniques(holdings3)).toEqual(new Map<string, number>());
   });
 });
+
 describe("testing getInvestedValue", () => {
   test("return invested value", () => {
     expect(getInvestedValue(holdings)).toEqual(290861.86);
+  });
+  test("return 0", () => {
+    expect(getInvestedValue(holdings3)).toEqual(0);
+  });
+});
+
+describe("testing getTotalValue", () => {
+  const holdings4 = [
+    { ticker: "TSLA", quantity: 1000, price: 290.38 },
+    { ticker: "AAPL", quantity: 1, price: 193.47 },
+  ];
+
+  const prices = new Map([
+    ["TSLA", 150.0],
+    ["AAPL", 100],
+  ]);
+  const prices2 = new Map([
+    ["TSLA", 0],
+    ["AAPL", 0],
+  ]);
+  test("should return 150100", () => {
+    expect(getTotalValue(holdings4, prices)).toEqual(150100);
+  });
+  test("should return 0", () => {
+    expect(getTotalValue(holdings4, prices2)).toEqual(0);
   });
 });
