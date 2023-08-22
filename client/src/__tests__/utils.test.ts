@@ -63,10 +63,26 @@ describe("testing getTotalValue", () => {
     ["TSLA", 0],
     ["AAPL", 0],
   ]);
+  const prices3 = new Map([
+    ["TSLA", -100],
+    ["AAPL", -150],
+  ]);
+  const prices4 = new Map([["AAPL", -150]]);
+
   test("should return 150100", () => {
     expect(getTotalValue(holdings4, prices)).toEqual(150100);
   });
   test("should return 0", () => {
     expect(getTotalValue(holdings4, prices2)).toEqual(0);
+  });
+  test("negative prices, should throw error", () => {
+    expect(() => getTotalValue(holdings4, prices3)).toThrowError(
+      "Missing price",
+    );
+  });
+  test("missing price, should throw error", () => {
+    expect(() => getTotalValue(holdings4, prices4)).toThrowError(
+      "Missing price",
+    );
   });
 });

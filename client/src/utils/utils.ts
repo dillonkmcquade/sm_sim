@@ -42,11 +42,9 @@ export function getTotalValue(
   holdings: Holding[],
   prices: Map<string, number>,
 ): number {
-  // const prices = await getPrices(holdings);
-
   return holdings.reduce((accumulator: number, currentValue: Holding) => {
     const price = prices.get(currentValue.ticker);
-    if (price === undefined) {
+    if (price === undefined || price < 0) {
       throw new Error("Missing price");
     }
     return accumulator + currentValue.quantity * price;

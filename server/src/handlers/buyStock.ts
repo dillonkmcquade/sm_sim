@@ -45,12 +45,20 @@ export const buyStock = async (req: Request, res: Response) => {
       message: "missing data",
     });
   }
+  const { users } = collections;
+  let currentPrice: number;
+
   try {
-    const { users } = collections;
-
     // get the current price of the given symbol
-    const currentPrice = await getPrice(id);
+    currentPrice = await getPrice(id);
+  } catch (err) {
+    return res.status(500).json({
+      status: 500,
+      message: `Error fetching current price for: ${id}`,
+    });
+  }
 
+  try {
     // Check if user exists
     const user = await users?.findOne<User>({ sub: auth });
     if (!user) {
