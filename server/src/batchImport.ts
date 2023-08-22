@@ -1,7 +1,6 @@
-import * as dotenv from "dotenv";
+import "dotenv/config";
 import { collections } from "./services/database.service";
 const batchImport = async () => {
-  dotenv.config();
   let data;
   try {
     const { tickers } = collections;
