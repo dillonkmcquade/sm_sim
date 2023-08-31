@@ -1,0 +1,30 @@
+# The name of the workflow. GitHub displays the names of your workflows under your repository's "Actions" tab. If you omit `name`, GitHub displays the workflow file path relative to the root of the repository.
+name: Node.js CI
+
+# This example workflow assumes that the default branch for your repository is `main`. If the default branch has a different name, edit this example and add your repository's default branch.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+#
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./client
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@0609f0983b7a228f052f81ef4c3d6510cae254ad
+        with:
+          version: '6.10.0'
+      # This step runs `npm ci` to install any dependencies listed in your `package.json` file.
+      - name: "clean install"
+        run: pnpm install
+        working-directory: ${{env.working-directory}}
+      # This step runs the `test` script that is specified under the `scripts` key in your `package.json` file.
+      - name: "test"
+        run: pnpm test
+        working-directory: ${{env.working-directory}}
+
