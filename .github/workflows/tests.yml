@@ -9,26 +9,56 @@ on:
     branches: [ main ]
 
 #
+#
 jobs:
+
   test:
+
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         node-version: [18]
+
     env:
       working-directory: ./client
+
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
+          node-version: 18
+
+      - uses: pnpm/action-setup@v2.2.4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          run_install: false
           version: 8
-          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('client/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: "install dependencies"
         run: pnpm install
         working-directory: ${{env.working-directory}}
+
       - name: "build"
         run: pnpm build
         working-directory: ${{env.working-directory}}
+
       - name: "test"
         run: pnpm test
         working-directory: ${{env.working-directory}}
