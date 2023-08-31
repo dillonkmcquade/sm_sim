@@ -1,5 +1,7 @@
 # MarketSim
 
+![tests](https://github.com/dillonkmcquade/sm_sim/actions/workflows/tests.yml/badge.svg)
+
 ![Dashboard](assets/dashboard.png)
 ![Stock Detail page](assets/stockDetails.png)
 
