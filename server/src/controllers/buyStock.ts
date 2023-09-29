@@ -31,7 +31,7 @@
 import { Response, Request } from "express";
 import { collections } from "../services/database.service";
 import type { Holding, User } from "../types";
-import { getPrice } from "../utils";
+import { getPrice } from "../utils/utils";
 
 export const buyStock = async (req: Request, res: Response) => {
   const auth = req.auth?.payload.sub; // User ID

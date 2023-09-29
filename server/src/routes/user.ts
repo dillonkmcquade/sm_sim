@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { createUser } from "../handlers/createUser";
-import { deleteUser } from "../handlers/deleteUser";
-import { updateUser } from "../handlers/updateUser";
-import { getUser } from "../handlers/getUser";
-import { toggleWatchList } from "../handlers/toggleWatchList";
-import { jwtCheck } from "../middleware";
+import { createUser } from "../controllers/createUser";
+import { deleteUser } from "../controllers/deleteUser";
+import { updateUser } from "../controllers/updateUser";
+import { getUser } from "../controllers/getUser";
+import { toggleWatchList } from "../controllers/toggleWatchList";
+import { jwtCheck } from "../middleware/middleware";
 
 const userRouter = Router();
 

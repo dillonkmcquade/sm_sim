@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { getQuote } from "../handlers/getQuote";
-import { getCandle } from "../handlers/getCandle";
-import { getNews } from "../handlers/getNews";
-import { checkCache } from "../middleware";
+import { getQuote } from "../controllers/getQuote";
+import { getCandle } from "../controllers/getCandle";
+import { getNews } from "../controllers/getNews";
+import { checkCache } from "../middleware/middleware";
 
 const stockRouter = Router();
 

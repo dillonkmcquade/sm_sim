@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { buyStock } from "../handlers/buyStock";
-import { sellStock } from "../handlers/sellStock";
-import { jwtCheck } from "../middleware";
+import { buyStock } from "../controllers/buyStock";
+import { sellStock } from "../controllers/sellStock";
+import { jwtCheck } from "../middleware/middleware";
 
 const transactionRouter = Router();
 

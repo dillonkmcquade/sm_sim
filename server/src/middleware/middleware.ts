@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { redisClient } from "./services/database.service";
+import { redisClient } from "../services/database.service";
 import { auth } from "express-oauth2-jwt-bearer";
 
 export async function checkCache(

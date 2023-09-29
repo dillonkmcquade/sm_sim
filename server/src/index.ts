@@ -5,12 +5,12 @@ import helmet from "helmet";
 import cors from "cors";
 
 import { connectToDatabase } from "./services/database.service";
-import { queryTickerByName } from "./handlers/queryTickerByName";
+import { queryTickerByName } from "./controllers/queryTickerByName";
 
 import userRouter from "./routes/user";
 import transactionRouter from "./routes/transaction";
 import stockRouter from "./routes/stock";
-import { checkCache } from "./middleware";
+import { checkCache } from "./middleware/middleware";
 
 dotenv.config();
 

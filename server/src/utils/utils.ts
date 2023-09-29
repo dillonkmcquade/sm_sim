@@ -1,4 +1,4 @@
-import { redisClient } from "./services/database.service";
+import { redisClient } from "../services/database.service";
 
 export async function getPrice(symbol: string): Promise<number> {
   const price = await redisClient.get(`/stock/quote?symbol=${symbol}`);
