@@ -1,16 +1,23 @@
-//return invested value, calculated from user holdings
-//quantity and price derived from holdings array in DB
-
 import type { Holding } from "../types";
 
-//price = purchase price
+/**
+ * Extracts the total amount of currency spent from the user's transactions
+ *
+ * @returns the total invested value as a number
+ */
 export function getInvestedValue(holdings: Holding[]): number {
   return holdings.reduce((accumulator, currentValue) => {
     return accumulator + Number(currentValue.quantity) * currentValue.price;
   }, 0);
 }
 
-//create map containing {ticker, price} combinations
+/**
+ * Returns the current price for a list of tickers
+ *
+ * @param holdings - An array of objects of type <Holding>
+ * @returns A new Map<string, number> representing the price (number) of each ticker (string)
+ *
+ */
 export async function getPrices(
   holdings: Holding[],
 ): Promise<Map<string, number>> {
@@ -37,7 +44,16 @@ export async function getPrices(
   return prices;
 }
 
-//returns total value of holdings
+/**
+ *
+ * Get the total portfolio value
+ *
+ * @param holdings - An array of objects of type <Holding>
+ *
+ * @param prices - A Map<string, number> representing the most recent price (number) of each ticker (string)
+ *
+ * @returns The total value as a number
+ */
 export function getTotalValue(
   holdings: Holding[],
   prices: Map<string, number>,
@@ -51,11 +67,11 @@ export function getTotalValue(
   }, 0);
 }
 
-// narrow holdings to holdings with acummulated quantity > 0
-// Some holdings might have negative quantity in the case of a sell transaction
-// So we have to add up all the positive and negatives of each ticker symbol to get the # of shares
-//
-// Returns a map
+/**
+ * Returns the user's holdings of each ticker, removes entries with quantities less than 0
+ *
+ * @returns A Map where the key = ticker and value = # of shares
+ */
 export function getUniques(holdings: Holding[]): Map<string, number> {
   //accumulate quantity and store in map
   const uniqueValues = new Map<string, number>();
@@ -77,6 +93,13 @@ export function getUniques(holdings: Holding[]): Map<string, number> {
   return uniqueValues;
 }
 
+/**
+ * Provides a debounce implementation for the useDebounce hook (wrapper to make it work in react)
+ *
+ * @param fn - The function to call after the timeout
+ * @param t - The length of the timeout
+ *
+ */
 export function debounce(fn: Function, t: number) {
   let timer: NodeJS.Timeout;
   return function (...args: any[]) {
