@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import { Quote } from "../types";
 
+/**
+ * @param ticker - The ticker symbol ie. `TSLA`
+ * @throws Error if fetched data is invalid
+ * @returns the most recent price for a stock
+ */
 export function useQuote(ticker: string) {
   const [quote, setQuote] = useState<Quote | null>();
   useEffect(() => {

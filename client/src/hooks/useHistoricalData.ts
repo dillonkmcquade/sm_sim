@@ -4,11 +4,18 @@
 import { useEffect, useState, useReducer } from "react";
 import type { Candle } from "../types";
 
+enum TimeRange {
+  ONE_DAY = 86400,
+  ONE_WEEK = 604800,
+  ONE_MONTH = 2629800,
+  THREE_MONTHS = 7776000,
+  SIX_MONTHS = 15638400,
+}
 const currentTime = Date.now() / 1000;
 const initialState = {
   resolution: "D",
   range: "1M",
-  from: Math.floor(currentTime - 2629800),
+  from: Math.floor(currentTime - TimeRange.ONE_MONTH),
   loading: false,
 };
 
@@ -22,28 +29,28 @@ const reducer = (
         ...state,
         resolution: "30",
         range: "1D",
-        from: Math.floor(currentTime - 86400),
+        from: Math.floor(currentTime - TimeRange.ONE_DAY),
       };
     case "1W":
       return {
         ...state,
         resolution: "D",
         range: "1W",
-        from: Math.floor(currentTime - 604800),
+        from: Math.floor(currentTime - TimeRange.ONE_WEEK),
       };
     case "1M":
       return {
         ...state,
         resolution: "D",
         range: "1M",
-        from: Math.floor(currentTime - 2629800),
+        from: Math.floor(currentTime - TimeRange.ONE_MONTH),
       };
     case "3M": {
       return {
         ...state,
         resolution: "D",
         range: "3M",
-        from: Math.floor(currentTime - 7776000),
+        from: Math.floor(currentTime - TimeRange.THREE_MONTHS),
       };
     }
     case "6M": {
@@ -51,7 +58,7 @@ const reducer = (
         ...state,
         resolution: "W",
         range: "6M",
-        from: Math.floor(currentTime - 15638400),
+        from: Math.floor(currentTime - TimeRange.SIX_MONTHS),
       };
     }
     case "loading": {
@@ -65,6 +72,10 @@ const reducer = (
   }
 };
 
+/**
+ * Custom hook for fetching Candle data for a specific ticker
+ * required in the linechart visuals
+ */
 export default function useHistoricalData(ticker: string) {
   const [data, setData] = useState<Candle | null>(null);
   const [state, dispatch] = useReducer(reducer, initialState);
