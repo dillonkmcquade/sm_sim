@@ -8,14 +8,17 @@ export async function checkCache(
   next: NextFunction,
 ) {
   const url = req.url;
-
-  const cached = await redisClient.get(url);
-  if (cached) {
-    return res
-      .status(200)
-      .json({ status: 200, fromCache: true, data: JSON.parse(cached) });
-  } else {
-    return next();
+  try {
+    const cached = await redisClient.get(url);
+    if (cached) {
+      return res
+        .status(200)
+        .json({ status: 200, fromCache: true, data: JSON.parse(cached) });
+    } else {
+      return next();
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
 
