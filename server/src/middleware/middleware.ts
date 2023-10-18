@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { redisClient } from "../services/database.service";
+import { redis } from "../index";
 import { auth } from "express-oauth2-jwt-bearer";
 
 export async function checkCache(
@@ -9,7 +9,7 @@ export async function checkCache(
 ) {
   const url = req.url;
   try {
-    const cached = await redisClient.get(url);
+    const cached = await redis.get(url);
     if (cached) {
       return res
         .status(200)

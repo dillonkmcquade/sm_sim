@@ -1,10 +1,11 @@
 import "dotenv/config";
-import { collections } from "../services/database.service";
+import { client } from "../index";
+import { Ticker } from "../types";
 const batchImport = async () => {
   let data;
+  await client.connect();
+  const tickers = client.db(process.env.DB_NAME).collection<Ticker>("tickers");
   try {
-    const { tickers } = collections;
-    if (!tickers) return;
     const fetchTickers = await fetch(
       `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${process.env.FINNHUB_KEY}`,
     );
@@ -21,6 +22,8 @@ const batchImport = async () => {
     if (err instanceof Error) {
       console.error(err.message);
     }
+  } finally {
+    await client.close();
   }
 };
 

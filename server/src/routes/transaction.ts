@@ -1,13 +1,12 @@
 import { Router } from "express";
-import { buyStock } from "../controllers/buyStock";
-import { sellStock } from "../controllers/sellStock";
 import { jwtCheck } from "../middleware/middleware";
+import { transactionController } from "../index";
 
 const transactionRouter = Router();
 
 transactionRouter
   .use(jwtCheck)
-  .patch("/buy/:id", buyStock)
-  .patch("/sell/:id", sellStock);
+  .patch("/buy/:id", (req, res) => transactionController.buy(req, res))
+  .patch("/sell/:id", (req, res) => transactionController.sell(req, res));
 
 export default transactionRouter;
