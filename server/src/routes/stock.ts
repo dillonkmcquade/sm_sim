@@ -1,15 +1,14 @@
 import { Router } from "express";
-import { getQuote } from "../controllers/getQuote";
-import { getCandle } from "../controllers/getCandle";
-import { getNews } from "../controllers/getNews";
 import { checkCache } from "../middleware/middleware";
+import { stockController } from "../index";
 
 const stockRouter = Router();
 
 stockRouter
   .use(checkCache)
-  .get("/news/:ticker", getNews)
-  .get("/quote/:ticker", getQuote)
-  .get("/candle/:ticker", getCandle);
+  .get("/news/:ticker", (req, res) => stockController.news(req, res))
+  .get("/quote/:ticker", (req, res) => stockController.quote(req, res))
+  .get("/candle/:ticker", (req, res) => stockController.candle(req, res))
+  .get("/search", (req, res) => stockController.search(req, res));
 
 export default stockRouter;

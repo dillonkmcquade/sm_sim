@@ -21,7 +21,7 @@ export default function Research() {
   const { results, error, loading, inputText, isSelected } = state;
 
   const recentlyViewed = Object.keys(window.sessionStorage).filter(
-    (key) => key !== "user"
+    (key) => key !== "user",
   );
   const navigate = useNavigate();
 
@@ -56,28 +56,19 @@ export default function Research() {
       default:
         return;
     }
-  } ;
+  };
 
   //query to backend
   const search = async () => {
     startSearch();
     try {
       const { REACT_APP_SERVER_URL } = process.env;
-      const controller = new AbortController();
-      const timeout = setTimeout(()=> {
-        controller.abort("Timeout");
-        errorMessage("Please be patient, it may take a moment for the server to boot up after inactivity.");
-        return
-      }, 5000)
       const request = await fetch(
-        `${REACT_APP_SERVER_URL}/search?name=${inputText}`, {
-          signal: controller.signal
-        }
+        `${REACT_APP_SERVER_URL}/stock/search?name=${inputText}`,
       );
       const response = await request.json();
       if (response.status === 200) {
         success(response.data);
-        clearTimeout(timeout)
       } else {
         errorMessage(response.message);
       }
@@ -143,9 +134,7 @@ export default function Research() {
 
       <div style={{ height: "20vh" }}>
         {error && (
-          <Alert
-            severity="error"
-          >
+          <Alert severity="error">
             <AlertTitle>Error</AlertTitle>
             {error}
           </Alert>

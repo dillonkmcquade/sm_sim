@@ -1,19 +1,17 @@
 import { Router } from "express";
-import { createUser } from "../controllers/createUser";
-import { deleteUser } from "../controllers/deleteUser";
-import { updateUser } from "../controllers/updateUser";
-import { getUser } from "../controllers/getUser";
-import { toggleWatchList } from "../controllers/toggleWatchList";
 import { jwtCheck } from "../middleware/middleware";
+import { userController } from "../index";
 
 const userRouter = Router();
 
 userRouter
   .use(jwtCheck)
-  .post("/", createUser)
-  .delete("/", deleteUser)
-  .patch("/update", updateUser)
-  .get("/", getUser)
-  .patch("/toggleWatchList", toggleWatchList);
+  .post("/", (req, res) => userController.create(req, res))
+  .get("/", (req, res) => userController.findOne(req, res))
+  .patch("/update", (req, res) => userController.update(req, res))
+  .delete("/", (req, res) => userController.delete(req, res))
+  .patch("/toggleWatchList", (req, res) =>
+    userController.toggleWatchList(req, res),
+  );
 
 export default userRouter;

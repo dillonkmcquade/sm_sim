@@ -1,7 +1,7 @@
-import { redisClient } from "../services/database.service";
+import { redis } from "../index";
 
 export async function getPrice(symbol: string): Promise<number> {
-  const price = await redisClient.get(`/stock/quote?symbol=${symbol}`);
+  const price = await redis.get(`/stock/quote?symbol=${symbol}`);
   if (price) {
     return JSON.parse(price);
   }
