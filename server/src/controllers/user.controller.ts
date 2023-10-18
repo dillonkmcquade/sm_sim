@@ -28,10 +28,10 @@ export class UserController {
    */
   async create(req: Request, res: Response) {
     const auth = req.auth!.payload.sub; // User ID
-    const { user } = req.body; // auth0 user object
+    const { user: userDto } = req.body; // auth0 user object
 
     //validate that we are receiving the user obj
-    if (!user) {
+    if (!userDto) {
       return res
         .status(400)
         .json({ status: 400, message: "missing user UUID" });
@@ -39,13 +39,13 @@ export class UserController {
 
     try {
       // If user already exists, return user object
-      const duplicate = await this.usersCollection.findOne({
+      const user = await this.usersCollection.findOne({
         sub: auth,
       });
-      if (duplicate) {
+      if (user) {
         return res
           .status(200)
-          .json({ status: 200, data: duplicate, message: "User exists" });
+          .json({ status: 200, data: user, message: "User exists" });
       }
 
       // If user does not exist, create new user in database
@@ -54,7 +54,7 @@ export class UserController {
         balance: 1000000,
         holdings: [],
         watchList: [],
-        ...user,
+        ...userDto,
       };
       await this.usersCollection.insertOne(newUser);
 
@@ -177,40 +177,29 @@ export class UserController {
       }
 
       // update user watch list
-      let update;
       if (isWatched && !user.watchList.includes(ticker)) {
         //Add
-        update = await this.usersCollection.updateOne(
-          { sub: auth },
-          { $push: { watchList: ticker } },
-        );
+        user.watchList.push(ticker);
       } else if (!isWatched && user.watchList.includes(ticker)) {
         //Remove
-        update = await this.usersCollection?.updateOne(
-          { sub: auth },
-          { $pull: { watchList: ticker } },
-        );
+        user.watchList.splice(user.watchList.indexOf(ticker));
       }
 
-      // handle DB errors
-      if (update && (update.matchedCount === 0 || update.modifiedCount === 0)) {
-        return res
-          .status(400)
-          .json({ status: 400, message: "Could not update user watch list" });
-      }
-
-      // retrieve updated user object
-      const newUser = await this.usersCollection.findOne({ sub: auth });
-      if (!newUser) {
+      // replace user
+      const updateResult = await this.usersCollection.replaceOne(
+        { sub: auth },
+        user,
+      );
+      if (updateResult.matchedCount === 0 || updateResult.modifiedCount === 0) {
         return res
           .status(500)
-          .json({ status: 500, message: "Internal server errror" });
+          .json({ status: 500, message: "internal server error" });
       }
 
       // return updated user object
       return res.status(200).json({
         status: 200,
-        data: newUser.watchList,
+        data: user.watchList,
       });
     } catch (error) {
       return res.status(500).json({ status: 500, message: "Server error" });
